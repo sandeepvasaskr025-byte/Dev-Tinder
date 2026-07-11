@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database")
 const User = require("./models/user");
-const userValidation = require("./middleware/userValidator")
+const userValidation = require("./middleware/userValidator");
+const bcrypt = require("bcryptjs")
 app.use(express.json());
 connectDB().then(()=>{
    console.log("Database connection Established")
@@ -14,12 +15,13 @@ connectDB().then(()=>{
   console.error("Database cannot be connected");
 })
 app.post("/signup",userValidation,async(req,res)=>{
-    const {email} =req.body;
+    const {email,password} =req.body;
     const existUser = await User.findOne({email});
     if(existUser){
         return res.status(400).json("User already Signedup")
     }
-    const user = new User(req.body);
+    const hashPassword = await bcrypt.hash(password,7)
+    const user = new User({...req.body,password:hashPassword});
     try{
        await user.save();
        res.send("User data saved successfully")
