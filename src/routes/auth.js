@@ -2,7 +2,7 @@ const express = require("express");
 const authRouter = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const userValidation = require("../middleware/userValidator");
+const {userValidation} = require("../middleware/userValidator");
 const authentication = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 authRouter.post("/signup",userValidation,async(req,res)=>{
@@ -24,7 +24,8 @@ authRouter.post("/signup",userValidation,async(req,res)=>{
 
 
 authRouter.post("/login",async(req,res)=>{
-    const {email, password} = req.body;
+    try {
+        const {email, password} = req.body;
     const isValid = await User.findOne({email});
     if(!isValid){
       return res.status(400).json("User is not registered")
@@ -37,6 +38,12 @@ authRouter.post("/login",async(req,res)=>{
     }  
     else{
         res.status(401).json("Invalid creditionals")
+    }
+    } catch (err) {
+        if(err.message==="TokenExpiredError"){
+           return res.status(401).json({ error: "Token has expired" }); 
+        }
+         res.status(500).json({ error: error.message });
     }
 })
 

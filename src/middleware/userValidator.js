@@ -8,6 +8,13 @@ const schema = joi.object({
     gender:joi.string().min(4).max(6).required()
 })
 
+const profileUpdate = joi.object({
+    firstName:joi.string().alphanum().trim(true).min(3).max(30),
+    lastName:joi.string().alphanum().min(1).max(20),
+    age:joi.number().integer(),
+    gender:joi.string().min(4).max(6)
+})
+
 const userValidation = async(req,res,next)=>{
     let {firstName,lastName,email,password,age,gender} = req.body;
     const payload = {firstName,lastName,email,password,age,gender};
@@ -19,4 +26,16 @@ const userValidation = async(req,res,next)=>{
         next();
     }
 }
-module.exports = userValidation;
+
+const updateProfile = async(req,res,next)=>{
+        let {firstName,lastName,age,gender} = req.body;
+        const payload = {firstName,lastName,age,gender};
+        const {error} = profileUpdate.validate(payload);
+        if(error){
+          return res.status(406).json(`Error in profile update Data : ${error.message}`)   
+        }
+        else{
+            next();
+        }
+}
+module.exports = {userValidation, updateProfile};
