@@ -2,7 +2,7 @@ const express = require("express");
 const userRouter = express.Router();
 const authentication = require('../middleware/auth');
 const ConnectionRequest = require("../models/connectionRequest");
-const { replaceOne } = require("../models/user");
+const User = require("../models/user");
 //Get all the pending connection request
 userRouter.get("/user/requests/received",authentication,async(req,res)=>{
     try {
@@ -35,4 +35,30 @@ userRouter.get("/user/connection",authentication,async(req,res)=>{
     res.status(200).json({data})
 })
 
+userRouter.get("/user/feed",authentication,async(req,res)=>{
+    // User shoule see the all user cards except
+    // 1.his own card
+    // 2.His connections
+    // 3.ignored people
+    // 4. already sent the connection request 
+    try {
+        const loggedInUser = req.user; 
+        const connectionRequest = await ConnectionRequest.find({
+            $or:[{ fromUserId:loggedInUser._id},
+             {toUserId:loggedInUser._id}] })
+    .select("fromUserId toUserId");
+    const hideUsers = new Set();
+    connectionRequest.forEach((req)=>{
+        hideUsers.add(req.fromUserId.toString()),
+        hideUsers.add(req.toUserId.toString())
+    })
+    console.log(hideUsers);
+    const users = await User.find({
+        _id:{$nin:Array.from(hideUsers)}
+    })
+    res.status(200).json({message:"Featched all card",users});   
+    } catch (error) {
+        res.status(400).json("Error",error.message)
+    }
+})
 module.exports = userRouter;
