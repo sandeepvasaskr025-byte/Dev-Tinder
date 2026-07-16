@@ -43,6 +43,9 @@ userRouter.get("/user/feed",authentication,async(req,res)=>{
     // 4. already sent the connection request 
     try {
         const loggedInUser = req.user; 
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+        const skip = (page-1)*10;
         const connectionRequest = await ConnectionRequest.find({
             $or:[{ fromUserId:loggedInUser._id},
              {toUserId:loggedInUser._id}] })
@@ -55,7 +58,7 @@ userRouter.get("/user/feed",authentication,async(req,res)=>{
     console.log(hideUsers);
     const users = await User.find({
         _id:{$nin:Array.from(hideUsers)}
-    })
+    }).skip(skip).limit(limit);
     res.status(200).json({message:"Featched all card",users});   
     } catch (error) {
         res.status(400).json("Error",error.message)
