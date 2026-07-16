@@ -43,8 +43,9 @@ userRouter.get("/user/feed",authentication,async(req,res)=>{
     // 4. already sent the connection request 
     try {
         const loggedInUser = req.user; 
-        const page = req.query.page || 1;
-        const limit = req.query.limit || 10;
+        const page = req.query.page || 1; 
+        let limit = req.query.limit || 10;
+        limit > 20 ? 20 : limit
         const skip = (page-1)*10;
         const connectionRequest = await ConnectionRequest.find({
             $or:[{ fromUserId:loggedInUser._id},
