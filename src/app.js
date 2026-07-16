@@ -5,12 +5,14 @@ const authRouter = require("./routes/auth");
 const cookieParser = require('cookie-parser');
 const requestRouter = require("./routes/request");
 const profileRouter = require("./routes/profile");
+const userRouter = require("./routes/user");
 
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api",authRouter);
 app.use("/api",profileRouter);
 app.use("/api",requestRouter);
+app.use("/api",userRouter);
 connectDB().then(()=>{
    console.log("Database connection Established")
    app.listen(7777,()=>{
