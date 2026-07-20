@@ -34,7 +34,7 @@ authRouter.post("/login",async(req,res)=>{
     if(validPass){
         const token = jwt.sign({_id:isValid._id},'sandeep@1996',{expiresIn:"1h"})
         res.cookie("token",token)
-        res.status(200).json({Message:"Login successful",data:isValid})
+        res.status(200).json({Message:"Login successful",isValid})
     }  
     else{
         res.status(401).json("Invalid creditionals")
