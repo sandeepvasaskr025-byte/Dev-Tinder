@@ -4,7 +4,7 @@ const authentication = async(req,res,next)=>{
     try{
          const {token} = req.cookies;
      if(!token){
-        return res.status(500).json("Token not valid")
+        return res.status(401).send("Please login")
     } 
     const verifyToken = jwt.verify(token,"sandeep@1996")
     const {_id} = verifyToken;

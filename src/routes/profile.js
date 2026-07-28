@@ -20,7 +20,7 @@ profileRouter.put("/profile/edit",authentication,updateProfile,async(req,res)=>{
     return res.status(400).json("Invalid edit request: password cannot be changed here");
   }
    
-    const updateProfile = await User.findByIdAndUpdate(_id,{$set:updates},{new:true});
+    const updateProfile = await User.findByIdAndUpdate(_id,{$set:updates},{ returnDocument: 'after' });
      if (!updateProfile) {
       return res.status(404).json("User not found");
     }

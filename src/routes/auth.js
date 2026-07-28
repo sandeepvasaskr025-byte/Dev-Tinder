@@ -14,8 +14,10 @@ authRouter.post("/signup",userValidation,async(req,res)=>{
     const hashPassword = await bcrypt.hash(password,7)
     const user = new User({...req.body,password:hashPassword});
     try{
-       await user.save();
-       res.send("User data saved successfully")
+       const newUser = await user.save();
+       const token = jwt.sign({_id:newUser._id},'sandeep@1996',{expiresIn:"1h"})
+       res.cookie("token",token)
+       res.json({message:"User data saved successfully",data:newUser})
     }
     catch(err){
        res.status(400).send("Error saving the user" + err.message)
@@ -28,7 +30,7 @@ authRouter.post("/login",async(req,res)=>{
         const {email, password} = req.body;
     const isValid = await User.findOne({email});
     if(!isValid){
-      return res.status(400).json("User is not registered")
+      return res.status(400).json({msg:"User is not registered"})
     }
     const validPass = await bcrypt.compare(password,isValid.password);
     if(validPass){
@@ -43,7 +45,7 @@ authRouter.post("/login",async(req,res)=>{
         if(err.message==="TokenExpiredError"){
            return res.status(401).json({ error: "Token has expired" }); 
         }
-         res.status(500).json({ error: error.message });
+         res.status(500).json({ error: err.message });
     }
 })
 
