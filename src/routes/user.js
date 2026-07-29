@@ -35,7 +35,7 @@ userRouter.get("/user/connection",authentication,async(req,res)=>{
     res.status(200).json({data})
 })
 
-userRouter.get("/user/feed",authentication,async(req,res)=>{
+userRouter.get("/feed",authentication,async(req,res)=>{
     // User shoule see the all user cards except
     // 1.his own card
     // 2.His connections
