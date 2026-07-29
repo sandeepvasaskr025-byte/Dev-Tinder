@@ -59,9 +59,11 @@ userRouter.get("/feed", authentication, async (req, res) => {
         })
         console.log(hideUsers);
         const users = await User.find({
-            _id: { $nin: Array.from(hideUsers) }
-        },
-            { _id: { $ne: loggedInUser._id } },).skip(skip).limit(limit);
+            $and: [{
+                _id: { $nin: Array.from(hideUsers) }
+            },
+            { _id: { $ne: loggedInUser._id } }]
+        },).skip(skip).limit(limit);
         res.status(200).json({ message: "Featched all card", data: users });
     } catch (error) {
         res.status(400).json("Error", error.message)
